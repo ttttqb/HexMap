@@ -1,34 +1,33 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public struct HexCoordinates
-{
-    [SerializeField]
-    private int x, z;
+public struct HexCoordinates {
+    [SerializeField] private int x, z;
 
     public int X => x;
 
     public int Z => z;
 
-    public HexCoordinates (int x, int z) {
+    public HexCoordinates(int x, int z) {
         this.x = x;
         this.z = z;
     }
-    public int Y => -X - Z;//立方体坐标，3个可能的运动方向
 
-    public static HexCoordinates FromOffsetCoordinates (int x, int z) {
+    public int Y => -X - Z; //立方体坐标，3个可能的运动方向
+
+    public static HexCoordinates FromOffsetCoordinates(int x, int z) {
         return new HexCoordinates(x - z / 2, z);
     }
-    
-    public override string ToString () {
+
+    public override string ToString() {
         return "(" + X.ToString() + ", " + Y.ToString() + ", " + Z.ToString() + ")";
     }
 
-    public string ToStringOnSeparateLines () {
+    public string ToStringOnSeparateLines() {
         return X.ToString() + "\n" + Y.ToString() + "\n" + Z.ToString();
     }
-    
-    public static HexCoordinates FromPosition (Vector3 position) {
+
+    public static HexCoordinates FromPosition(Vector3 position) {
         // z=0时的坐标
         float x = position.x / (HexMetrics.innerRadius * 2f);
         float y = -x;
@@ -44,7 +43,7 @@ public struct HexCoordinates
             // 舍弃四舍五入时增量最大的坐标，并从其他两个坐标中重构它
             float dX = Mathf.Abs(x - iX);
             float dY = Mathf.Abs(y - iY);
-            float dZ = Mathf.Abs(-x -y - iZ);
+            float dZ = Mathf.Abs(-x - y - iZ);
 
             if (dX > dY && dX > dZ) {
                 iX = -iY - iZ;

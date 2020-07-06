@@ -2,11 +2,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HexGrid : MonoBehaviour
-{
+public class HexGrid : MonoBehaviour {
     public int chunkCountX = 4, chunkCountZ = 3;
     int cellCountX, cellCountZ;
-    
+
     public HexCell cellPrefab;
     private HexCell[] cells;
 
@@ -15,12 +14,11 @@ public class HexGrid : MonoBehaviour
     public Color defaultColor = Color.white;
 
     public Texture2D noiseSource;
-    
+
     public HexGridChunk chunkPrefab = default;
     private HexGridChunk[] chunks;
-    
-    void Awake()
-    {
+
+    void Awake() {
         HexMetrics.noiseSource = noiseSource;
 
         cellCountX = chunkCountX * HexMetrics.chunkSizeX;
@@ -30,9 +28,8 @@ public class HexGrid : MonoBehaviour
         CreateCells();
     }
 
-    void CreateChunks()
-    {
-        chunks = new HexGridChunk[chunkCountX*chunkCountZ];
+    void CreateChunks() {
+        chunks = new HexGridChunk[chunkCountX * chunkCountZ];
         for (int z = 0, i = 0; z < chunkCountZ; z++) {
             for (int x = 0; x < chunkCountX; x++) {
                 HexGridChunk chunk = chunks[i++] = Instantiate(chunkPrefab);
@@ -41,7 +38,7 @@ public class HexGrid : MonoBehaviour
         }
     }
 
-    void CreateCells () {
+    void CreateCells() {
         cells = new HexCell[cellCountZ * cellCountX];
 
         for (int z = 0, i = 0; z < cellCountZ; z++) {
@@ -51,14 +48,12 @@ public class HexGrid : MonoBehaviour
         }
     }
 
-    private void OnEnable()
-    {
+    private void OnEnable() {
         HexMetrics.noiseSource = noiseSource;
     }
-    
 
-    void CreateCell(int x, int z, int i)
-    {
+
+    void CreateCell(int x, int z, int i) {
         Vector3 position;
         position.x = (x + z * 0.5f - z / 2) * (HexMetrics.innerRadius * 2f);
         position.y = 0f;
@@ -69,17 +64,14 @@ public class HexGrid : MonoBehaviour
         cell.transform.localPosition = position;
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
         cell.Color = defaultColor;
-        
+
         // 设置邻居
-        if (x > 0)
-        {
-            cell.SetNeighbor(HexDirection.W, cells[i-1]);
+        if (x > 0) {
+            cell.SetNeighbor(HexDirection.W, cells[i - 1]);
         }
 
-        if (z > 0)
-        {
-            if ((z & 1) == 0)
-            {
+        if (z > 0) {
+            if ((z & 1) == 0) {
                 cell.SetNeighbor(HexDirection.SE, cells[i - cellCountX]);
                 if (x > 0) {
                     cell.SetNeighbor(HexDirection.SW, cells[i - cellCountX - 1]);
@@ -106,8 +98,7 @@ public class HexGrid : MonoBehaviour
         AddCellToChunk(x, z, cell);
     }
 
-    void AddCellToChunk(int x, int z, HexCell cell)
-    {
+    void AddCellToChunk(int x, int z, HexCell cell) {
         int chunkX = x / HexMetrics.chunkSizeX;
         int chunkZ = z / HexMetrics.chunkSizeZ;
         HexGridChunk chunk = chunks[chunkX + chunkZ * chunkCountX];
@@ -117,30 +108,29 @@ public class HexGrid : MonoBehaviour
         chunk.AddCell(localX + localZ * HexMetrics.chunkSizeX, cell);
     }
 
-    public HexCell GetCell (Vector3 position) {
+    public HexCell GetCell(Vector3 position) {
         position = transform.InverseTransformPoint(position);
         var coordinates = HexCoordinates.FromPosition(position);
         var index = coordinates.X + coordinates.Z * cellCountX + coordinates.Z / 2;
         return cells[index];
     }
 
-    public HexCell GetCell(HexCoordinates coordinates)
-    {
+    public HexCell GetCell(HexCoordinates coordinates) {
         int z = coordinates.Z;
         if (z < 0 || z >= cellCountZ) {
             return null;
         }
+
         int x = coordinates.X + z / 2;
         if (x < 0 || x >= cellCountX) {
             return null;
         }
+
         return cells[x + z * cellCountX];
     }
 
-    public void ShowUI(bool visible)
-    {
-        for (var i = 0; i < chunks.Length; i++)
-        {
+    public void ShowUI(bool visible) {
+        for (var i = 0; i < chunks.Length; i++) {
             chunks[i].ShowUI(visible);
         }
     }
